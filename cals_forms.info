@@ -1,0 +1,7 @@
+;$Id$
+name = CALS Forms Overrides
+package = --cals
+core = 7.x
+files[] = cals_forms.module
+
+dependencies[] = ilsauthenmulti
