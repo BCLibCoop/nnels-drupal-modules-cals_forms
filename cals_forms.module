@@ -77,6 +77,42 @@ function _cals_forms_get_sql() {
 
 
 /* ----------- The forms ------------ */
+/**
+ * Implements hook_form_alter().
+ */
+function cals_forms_form_alter(&$form, &$form_state, $form_id) {
+	switch($form_id) {
+		case "organization_node_form":
+			// do we want a multistep form? Probably not ... but if we do, 
+			// implement a new form_state var to track
+			// if (!isset($form_state['stage'])) $form_state['stage'] = 'create_new_node';
+			//$form['#submit'][] = '_cals_forms_org_submit'; //doesn't seem to work.
+ 			$form['actions']['submit']['#submit'][] = '_cals_forms_org_submit';
+			break;
+		
+	}
+
+}
+
+
+function _cals_forms_org_submit($form, &$form_state) {
+	$nid = $form_state['node']->nid;
+	//printAndDie($form_state['node']);
+  $form_state['redirect'] = 'node/' . $nid . '/ils-authentication';
+
+}
+
+/**
+ * Implements hook_field_extra_fields().
+ *
+ * Adds 'file' as an extra field, so that its display and form component can be
+ * weighted relative to the fields that are added to file entity bundles.
+ */
+function cals_forms_field_extra_fields() {
+	return drupal_get_form("ilsauthenmulti_edit_target", 1);
+
+}
+
 
 /**
  * @todo Please document this function.
@@ -164,15 +200,5 @@ function cals_forms_nodeapi(&$node, $op, $arg, $page) {
       
       break;    
   }
-
-}
-
-
-/**
- * Implements hook_form_alter().
- */
-function cals_forms_form_alter(&$form, &$form_state, $form_id) {
-
-	
 
 }
