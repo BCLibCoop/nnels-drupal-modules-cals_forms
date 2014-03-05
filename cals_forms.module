@@ -10,26 +10,7 @@
  */ 
 function cals_forms_menu() { 
 	$items = array();
-	
-  $items['node/%node/ils-authentication'] = array(
-    'title' => 'ILS Authentication',
-    'page callback' => 'drupal_get_form',
-    //'page arguments' => array('cals_forms_ils_auth_form', 1),
-    
-   	//'access callback' => 'cals_forms_check_access',
-    
-    //let's use Mark's multi auth form instead!!
-   	'page arguments' => array('ilsauthenmulti_edit_target'),
-		'access callback' => 'user_access',
-    'access arguments' => array(1),
-    'weight' => 6,
-    'type' => MENU_LOCAL_TASK,
-
-
-  );
-
-	
-	
+ 
 	return $items;
 }	
 
@@ -41,14 +22,14 @@ function cals_forms_menu() {
  * @return
  *   TRUE if user can make conversions using this type, FALSE otherwise.
  */
-function cals_forms_check_access($node) {
+function cals_forms_check_accessxxxxx($node) {
   $access = (user_access('administer ILS Auth') || $node->type == 'organization' ) ? TRUE : FALSE;
   return $access;
 }
 /**
  * Implements hook_permission().
  */
-function cals_forms_permission() {
+function cals_forms_permissionxxxx() {
   $types = node_type_get_types();
   $permissions = array(
     'administer ILS Auth' => array(
@@ -60,105 +41,36 @@ function cals_forms_permission() {
   return $permissions;
 }
 
-
-function _cals_forms_get_sql() {
-  $referring_url = $_SERVER['HTTP_REFERER'];
-  $target = db_query(
-  	"SELECT * 
-  	FROM {ilsauthenmulti} 
-  	WHERE active = :active AND referring_url = :ref", 
-  	array(':active' => '1', ':ref' => $referring_url))->fetchAssoc();
-  	
-  $_SESSION['ilsauthenmulti_target_driver'] = $target['driver'];
-
-
-
-}
-
+ 
 
 /* ----------- The forms ------------ */
 /**
  * Implements hook_form_alter().
  */
 function cals_forms_form_alter(&$form, &$form_state, $form_id) {
+
 	switch($form_id) {
-		case "organization_node_form":
+		case "post_node_form":
 			// do we want a multistep form? Probably not ... but if we do, 
 			// implement a new form_state var to track
 			// if (!isset($form_state['stage'])) $form_state['stage'] = 'create_new_node';
 			//$form['#submit'][] = '_cals_forms_org_submit'; //doesn't seem to work.
- 			$form['actions']['submit']['#submit'][] = '_cals_forms_org_submit';
+ 			//$form['actions']['submit']['#submit'][] = '_cals_forms_org_submit';
 			break;
 		
 	}
 
 }
 
-
-function _cals_forms_org_submit($form, &$form_state) {
-	$nid = $form_state['node']->nid;
-	//printAndDie($form_state['node']);
-  $form_state['redirect'] = 'node/' . $nid . '/ils-authentication';
-
-}
-
-/**
- * Implements hook_field_extra_fields().
- *
- * Adds 'file' as an extra field, so that its display and form component can be
- * weighted relative to the fields that are added to file entity bundles.
- */
-function cals_forms_field_extra_fields() {
-	return drupal_get_form("ilsauthenmulti_edit_target", 1);
-
-}
-
-
-/**
- * @todo Please document this function.
- */
-function cals_forms_ils_auth_form($form, $form_state, $node) {
-  $form = array();
-
-	$form['referring_url'] = array(
-	  '#type' => 'textfield',
-	  '#title' => t("Referring URL"),
-	  '#required' => TRUE,
-	);
-	
-	
-	
-	$form['submit'] = array(
-      '#type' => 'submit',
-      '#value' => t("Update"),
-      '#weight' => 100,
-    );
  
-
-  return $form;
-}
-
-/**
- * @todo Please document this function.
- */
-function  cals_forms_ils_auth_form_validate($form, &$form_state) {
  
-}
-
 /**
  * @todo Please document this function.
  */
-function  cals_forms_ils_auth_form_submit($form, &$form_state) {
-  // Remember the destination type
-
-		/*
-    $form_state['rebuild'] = TRUE;
-    $form_state['storage']['destination_type'] = $form_state['values']['destination_type'];
-		*/
-
-    //$form_state['storage'] = array();
-    $form_state['redirect'] = "node/" . $nid;
-}
+ 
+/**
+ * @todo Please document this function.
+ */
 
 /**
  * implementation hook_menu_alter();
@@ -183,22 +95,4 @@ function cals_forms_help($path, $arg) {
 
 		return t('A demo module for the CALS site. Thanks for visiting %user', $values);
 	}
-}
-
-/**
- * Implementation of hook_nodeapi().
- */
-function cals_forms_nodeapi(&$node, $op, $arg, $page) {
-  switch ($op) {
-    case 'validate':
-
-      break;
-      
-    case 'insert':
-      
-      //printAndDie($node);
-      
-      break;    
-  }
-
 }

@@ -1,7 +1,6 @@
 ;$Id$
 name = CALS Forms Overrides
+description = Used to theme / override specific forms.
 package = --cals
 core = 7.x
 files[] = cals_forms.module
-
-dependencies[] = ilsauthenmulti
