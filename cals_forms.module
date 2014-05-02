@@ -14,33 +14,6 @@ function cals_forms_menu() {
 	return $items;
 }	
 
-/**
- * Checks if user has access to permission and node type is organization
- *
- * @param $node
- *   A node object to be checked.
- * @return
- *   TRUE if user can make conversions using this type, FALSE otherwise.
- */
-function cals_forms_check_accessxxxxx($node) {
-  $access = (user_access('administer ILS Auth') || $node->type == 'organization' ) ? TRUE : FALSE;
-  return $access;
-}
-/**
- * Implements hook_permission().
- */
-function cals_forms_permissionxxxx() {
-  $types = node_type_get_types();
-  $permissions = array(
-    'administer ILS Auth' => array(
-      'title' => t('administer ILS Authentication'),
-      'description' => t('Grants full permissions for admininstrating ILS Authentication.'),
-    ),
-  );
-  
-  return $permissions;
-}
-
  
 
 /* ----------- The forms ------------ */
@@ -48,51 +21,57 @@ function cals_forms_permissionxxxx() {
  * Implements hook_form_alter().
  */
 function cals_forms_form_alter(&$form, &$form_state, $form_id) {
-
+	
 	switch($form_id) {
-		case "post_node_form":
-			// do we want a multistep form? Probably not ... but if we do, 
-			// implement a new form_state var to track
-			// if (!isset($form_state['stage'])) $form_state['stage'] = 'create_new_node';
-			//$form['#submit'][] = '_cals_forms_org_submit'; //doesn't seem to work.
- 			//$form['actions']['submit']['#submit'][] = '_cals_forms_org_submit';
+	
+		case "views_exposed_form":
+
+			if($form['#id'] == 'views-exposed-form-cals-users-page') {
+				
+				//limit org field to just orgs associated with existing users.
+				//this limits list to manageable number.
+				
+				$qry = db_query("SELECT distinct n.nid, n.title, fd.* 
+					FROM {field_data_field_organization} fd inner join {node} n on fd.field_organization_nid = n.nid 
+					WHERE fd.entity_type = :value
+					order by n.title", 
+					array(":value" => "user")
+				);
+			  //build options
+			  $options = array(t("All") => t("-Any-"));
+			  
+			  foreach($qry as $row)  $options[$row->nid] = $row->title;
+	
+			  $form['field_organization_nid']['#options'] = $options;
+			}
+
+			break;
+		case "views_form_cals_users_page":
+			//printAndDie($form);
+			//dpm($form['field_organization']);
+		
+			break;
+		case "post_node_formx":
+			$group = og_context($group_type = 'node', $group = NULL);
+			//dpm($group);
+			if(!$group) {
+				drupal_set_message("You need to be posting via a group", "error");
+			  //drupal_access_denied("oops, need to be posting from a group");
+			}
+			if(!is_numeric($form['nid']['#value']) ) {
+				
+				//$form['og_group_ref']['und'][0]['default']['#default_value']
+				//unset($form['og_group_ref']); //['#type']); // = 'value';
+				$form['og_group_ref']['und']['#title'] = '';
+				unset($form['og_group_ref']['und']['#prefix']);
+				unset($form['og_group_ref']['und']['#suffix']);
+				$form['og_group_ref']['und'][0]['default']['#default_value'] = $group['gid'];
+				$form['og_group_ref']['und'][0]['default']['#type'] = 'value';
+				//$form['og_group_ref']['und'][0]['admin']['#type'] = 'value';
+			}
+			//dpm($form['og_group_ref']['und'][0]['default']);
 			break;
 		
 	}
 
-}
-
- 
- 
-/**
- * @todo Please document this function.
- */
- 
-/**
- * @todo Please document this function.
- */
-
-/**
- * implementation hook_menu_alter();
- * @param unknown_type $items
-
-function cals_forms_menu_alter(&$items) {
-
-  // Change node clone menu item to a tab instead of an action
-  $items['node/%node/clone']['type'] = MENU_LOCAL_TASK;
-  
-}
- */
-
-/**
- * Implements hook_help().
- */
-
-function cals_forms_help($path, $arg) {
-	if ($path == 'admin/help#cals') {
-		global $user;
-		$values = array('%user' => $user->name); 
-
-		return t('A demo module for the CALS site. Thanks for visiting %user', $values);
-	}
 }
