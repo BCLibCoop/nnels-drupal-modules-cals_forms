@@ -22,14 +22,13 @@ function cals_forms_form_alter(&$form, &$form_state, $form_id) {
 	
 	//dpm($form_id);
 	switch($form_id) {
-
+		//overrides calsauthentication library node selector
 		case "calsauthen_edit_target":
 		case "calsauthen_add_target":
 			
 			$qry = db_query(
 				"SELECT distinct n.nid, n.title, fa.field_address_administrative_area as prov 
 				FROM 
-				
 					{node} n  inner join {field_data_field_address} fa on fa.entity_id = n.nid
 				  inner join {field_data_field_target} ft on ft.entity_id = n.nid
 				order by fa.field_address_administrative_area, n.title" 
