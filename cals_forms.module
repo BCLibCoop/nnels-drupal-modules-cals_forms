@@ -14,26 +14,24 @@ function cals_forms_menu() {
 	return $items;
 }	
 
- 
-
 /* ----------- The forms ------------ */
 /**
  * Implements hook_form_alter().
  */
 function cals_forms_form_alter(&$form, &$form_state, $form_id) {
 	
+	//dpm($form_id);
 	switch($form_id) {
-
+		//overrides calsauthentication library node selector
 		case "calsauthen_edit_target":
 		case "calsauthen_add_target":
 			
-			$qry = db_query("SELECT distinct n.nid, n.title, fd.*, fa.field_address_administrative_area as prov 
-				FROM {field_data_field_organization} fd inner join {node} n on fd.field_organization_nid = n.nid 
-				  inner join {field_data_field_address} fa on fa.entity_id = n.nid
+			$qry = db_query(
+				"SELECT distinct n.nid, n.title, fa.field_address_administrative_area as prov 
+				FROM 
+					{node} n  inner join {field_data_field_address} fa on fa.entity_id = n.nid
 				  inner join {field_data_field_target} ft on ft.entity_id = n.nid
-				WHERE fd.entity_type = :value
-				order by fa.field_address_administrative_area, n.title", 
-				array(":value" => "user")
+				order by fa.field_address_administrative_area, n.title" 
 			);		
 			$options = array();
 			
@@ -41,8 +39,7 @@ function cals_forms_form_alter(&$form, &$form_state, $form_id) {
 				$options[$row->prov][$row->nid] = $row->title;
 			}
 			$form['node']['#options'] = $options;
-			$form['node']['#description'] = t("Only libraries tagged as a Target will be displayed in this list");
-			//printAndDie($options, $form);		
+			$form['node']['#description'] = t("Only libraries tagged as a Target will be displayed in this select list");
 			break;
 		
 		case "views_exposed_form":
