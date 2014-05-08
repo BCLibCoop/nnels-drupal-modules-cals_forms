@@ -72,30 +72,31 @@ function cals_forms_form_alter(&$form, &$form_state, $form_id) {
 			}
 
 			break;
-		case "views_form_cals_users_page":
-			//printAndDie($form);
-			//dpm($form['field_organization']);
-		
-			break;
-		case "post_node_formx":
-			$group = og_context($group_type = 'node', $group = NULL);
-			//dpm($group);
+
+		case "post_node_form":
+			global $user;
+			$group = og_context($group_type = 'node', $group = NULL); //get group details
 			if(!$group) {
-				drupal_set_message("You need to be posting via a group", "error");
+				drupal_set_message("You should be posting via a group", "error");
 			  //drupal_access_denied("oops, need to be posting from a group");
 			}
 			if(!is_numeric($form['nid']['#value']) ) {
+				//if simple select widget type
+				if(isset($form['og_group_ref'][LANGUAGE_NONE]['#default_value'])) $form['og_group_ref'][LANGUAGE_NONE]['#default_value'] = $group['gid'];
+				//if multiple select widget type
+				if(isset($form['og_group_ref'][LANGUAGE_NONE][0]['#default_value'])) $form['og_group_ref'][LANGUAGE_NONE][0]['#default_value'] = $group['gid'];
 				
-				//$form['og_group_ref']['und'][0]['default']['#default_value']
-				//unset($form['og_group_ref']); //['#type']); // = 'value';
-				$form['og_group_ref']['und']['#title'] = '';
-				unset($form['og_group_ref']['und']['#prefix']);
-				unset($form['og_group_ref']['und']['#suffix']);
-				$form['og_group_ref']['und'][0]['default']['#default_value'] = $group['gid'];
-				$form['og_group_ref']['und'][0]['default']['#type'] = 'value';
-				//$form['og_group_ref']['und'][0]['admin']['#type'] = 'value';
+				
+				//hide the group_ref and visibility fields:
+				
+				if($user->uid != 1111111111111111) {
+					$form['og_group_ref'][LANGUAGE_NONE]['#type'] = 'value';
+					//visibility
+					$form['group_content_access'][LANGUAGE_NONE]['#type'] = 'value';
+				}
+				
 			}
-			//dpm($form['og_group_ref']['und'][0]['default']);
+			//dpm($form['og_group_ref'][LANGUAGE_NONE][0]['default']);
 			break;
 		
 	}
