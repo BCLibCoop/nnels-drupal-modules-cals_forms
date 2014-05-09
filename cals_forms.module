@@ -19,7 +19,16 @@ function cals_forms_menu() {
  * Implements hook_form_alter().
  */
 function cals_forms_form_alter(&$form, &$form_state, $form_id) {
+
+	switch($form_id) {
+	  case "legal_login":
+	  case "user_register_form":
+	    //printPre(array_keys($form), $form);
+	    break;
+
 	
+	}
+
 	//dpm($form_id);
 	switch($form_id) {
 		//overrides calsauthentication library node selector
@@ -31,13 +40,16 @@ function cals_forms_form_alter(&$form, &$form_state, $form_id) {
 				FROM 
 					{node} n  inner join {field_data_field_address} fa on fa.entity_id = n.nid
 				  inner join {field_data_field_target} ft on ft.entity_id = n.nid
-				order by fa.field_address_administrative_area, n.title" 
+				order by n.title, fa.field_address_administrative_area" 
 			);		
 			$options = array();
 			
 			foreach($qry as $row) {
-				$options[$row->prov][$row->nid] = $row->title;
+				$options[$row->nid] = $row->title;
 			}
+			//printAndDie($options,$form['node']);
+
+			
 			$form['node']['#options'] = $options;
 			$form['node']['#description'] = t("Only libraries tagged as a Target will be displayed in this select list");
 			break;
