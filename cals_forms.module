@@ -32,8 +32,11 @@ function cals_forms_form_alter(&$form, &$form_state, $form_id) {
 	//dpm($form_id);
 	switch($form_id) {
 		//overrides calsauthentication library node selector
-		case "calsauthen_edit_targetx":
-		case "calsauthen_add_targetx":
+		case "calsauthen_edit_target":
+		case "calsauthen_add_target":
+
+                        // If we are coming from the node (via a menu item), grab the current nid.
+                        $nid = arg(1);
 			
 			$qry = db_query(
 				"SELECT distinct n.nid, n.title, fa.field_address_administrative_area as prov 
@@ -48,6 +51,7 @@ function cals_forms_form_alter(&$form, &$form_state, $form_id) {
 				$options[$row->nid] = $row->title;
 			}
 			$form['node']['#options'] = $options;
+			$form['node']['#default_value'] = $nid;
 			$form['node']['#description'] = t("Only libraries tagged as a Target will be displayed in this select list");
 			break;
 		
