@@ -89,8 +89,10 @@ function cals_forms_form_alter(&$form, &$form_state, $form_id) {
 		case "post_node_form":
 			global $user;
 			$group = og_context($group_type = 'node', $group = NULL); //get group details
+			
+			//review this later
 			if(!$group) {
-				drupal_set_message("You should be posting via a group", "error");
+				//drupal_set_message("You should be posting via a group", "error");
 			  //drupal_access_denied("oops, need to be posting from a group");
 			}
 			if(!is_numeric($form['nid']['#value']) ) {
