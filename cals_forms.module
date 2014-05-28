@@ -89,31 +89,48 @@ function cals_forms_form_alter(&$form, &$form_state, $form_id) {
 		case "post_node_form":
 			global $user;
 			$group = og_context($group_type = 'node', $group = NULL); //get group details
-			
-			//review this later
-			if(!$group) {
-				//drupal_set_message("You should be posting via a group", "error");
-			  //drupal_access_denied("oops, need to be posting from a group");
-			}
-			if(!is_numeric($form['nid']['#value']) ) {
-				//if simple select widget type
-				if(isset($form['og_group_ref'][LANGUAGE_NONE]['#default_value'])) $form['og_group_ref'][LANGUAGE_NONE]['#default_value'] = $group['gid'];
-				//if multiple select widget type
-				if(isset($form['og_group_ref'][LANGUAGE_NONE][0]['#default_value'])) $form['og_group_ref'][LANGUAGE_NONE][0]['#default_value'] = $group['gid'];
-				
-				
-				//hide the group_ref and visibility fields:
-				
-				if($user->uid != 1111111111111111) {
-					$form['og_group_ref'][LANGUAGE_NONE]['#type'] = 'value';
-					//visibility
-					$form['group_content_access'][LANGUAGE_NONE]['#type'] = 'value';
+
+			//if simple select widget type: disable for time-being
+			/*
+				if(!is_numeric($form['nid']['#value']) ) {
+	
 				}
-				
-			}
-			//dpm($form['og_group_ref'][LANGUAGE_NONE][0]['default']);
+			
+			*/
+			if(isset($form['og_group_ref'][LANGUAGE_NONE]['#default_value']) && isset($group['gid']) ) 
+			  $form['og_group_ref'][LANGUAGE_NONE]['#default_value'] = $group['gid'];
+			
+			//if multiple select widget type
+			if(isset($form['og_group_ref'][LANGUAGE_NONE][0]['#default_value']) && isset($group['gid']) ) 
+			  $form['og_group_ref'][LANGUAGE_NONE][0]['#default_value'] = $group['gid'];
+
+			//disable the group_ref and visibility fields:
+			//if( isset($form['og_group_ref'][LANGUAGE_NONE]) ) $form['og_group_ref'][LANGUAGE_NONE]['#disabled'] = TRUE;
+			if( isset($form['og_group_ref'][LANGUAGE_NONE]) ) $form['og_group_ref'][LANGUAGE_NONE]['#type'] = 'value';
+			if( isset($form['group_content_access'][LANGUAGE_NONE]) ) $form['group_content_access'][LANGUAGE_NONE]['#type'] = 'value';
+			$form['#submit'][] = '_cals_forms_update_group_ref_value';
 			break;
 		
 	}
 
+}
+/**
+ * Custom submit function to re-populate og_group_ref due to issues w/ CORS file upload widget
+ * overriding value.
+ */
+function _cals_forms_update_group_ref_value($form, &$form_state) {
+	$group = og_context($group_type = 'node', $group = NULL);
+	if(empty($form_state['values']['og_group_ref'][LANGUAGE_NONE][0]['target_id'])) {
+    if(isset($goup['gid'])) {
+    	$form_state['values']['og_group_ref'][LANGUAGE_NONE][0]['target_id'] = $group['gid'];
+
+    }
+    else if( is_numeric(arg(1)) && arg(0) == 'node' ) {
+	    $node = node_load(arg(1));
+	    $group = og_context($group_type = 'node', $group = $node);
+	    if(!empty($group)) {
+	      $form_state['values']['og_group_ref'][LANGUAGE_NONE][0]['target_id'] = $group['gid'];
+	    }
+	  }
+	}
 }
