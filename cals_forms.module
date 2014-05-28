@@ -106,8 +106,10 @@ function cals_forms_form_alter(&$form, &$form_state, $form_id) {
 
 			//disable the group_ref and visibility fields:
 			//if( isset($form['og_group_ref'][LANGUAGE_NONE]) ) $form['og_group_ref'][LANGUAGE_NONE]['#disabled'] = TRUE;
-			if( isset($form['og_group_ref'][LANGUAGE_NONE]) ) $form['og_group_ref'][LANGUAGE_NONE]['#type'] = 'value';
-			if( isset($form['group_content_access'][LANGUAGE_NONE]) ) $form['group_content_access'][LANGUAGE_NONE]['#type'] = 'value';
+			if($user->uid != 1) {
+				if( isset($form['og_group_ref'][LANGUAGE_NONE]) ) $form['og_group_ref'][LANGUAGE_NONE]['#type'] = 'value';
+				if( isset($form['group_content_access'][LANGUAGE_NONE]) ) $form['group_content_access'][LANGUAGE_NONE]['#type'] = 'value';
+			}
 			$form['#submit'][] = '_cals_forms_update_group_ref_value';
 			break;
 		
