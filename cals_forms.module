@@ -19,7 +19,7 @@ function cals_forms_menu() {
  * Implements hook_form_alter().
  */
 function cals_forms_form_alter(&$form, &$form_state, $form_id) {
-
+	
 	switch($form_id) {
 	  case "legal_login":
 	  case "user_register_form":
@@ -28,9 +28,25 @@ function cals_forms_form_alter(&$form, &$form_state, $form_id) {
 
 	
 	}
-
-	//dpm($form_id);
+	if(strpos($form_id, "_node_form")) {
+	  $node = node_load($form['nid']['#value']);
+	  $revisions = node_revision_overview($node);
+  	//this adds revisions into the "Authoring information pane"
+   	$form['author']['additional'] = array(
+   		'#markup' => drupal_render($revisions), //views_embed_view("cals_revisions", "default", $form['nid']['#value']), 
+   	);
+	}
+	
 	switch($form_id) {
+		case "repository_item_node_form":
+			$form['field_file_resource'][LANGUAGE_NONE][0]['field_organization'][LANGUAGE_NONE]['#required'] = TRUE; 
+
+			$form['field_file_resource'][LANGUAGE_NONE][0]['field_organization'][LANGUAGE_NONE]['#options'] = 
+				_cals_forms_get_org_options_by_users();
+			//dpm($form);
+	
+			break;
+	
 		//overrides calsauthentication library node selector
 		case "calsauthen_edit_target":
 		case "calsauthen_add_target":
@@ -57,33 +73,9 @@ function cals_forms_form_alter(&$form, &$form_state, $form_id) {
 		
 		case "views_exposed_form":
     	//$form['search_api_views_fulltext_2']['#attributes'] = array('placeholder' => t('Search for author, title, description'));
-
-
 			if($form['#id'] == 'views-exposed-form-cals-users-page') {
-				
-				//limit org field to just orgs associated with existing users.
-				//this limits list to manageable number.
-
-				$qry = db_query("SELECT distinct n.nid, n.title, fd.*, fa.field_address_administrative_area as prov 
-					FROM {field_data_field_organization} fd inner join {node} n on fd.field_organization_nid = n.nid 
-					  inner join {field_data_field_address} fa on fa.entity_id = n.nid
-					WHERE fd.entity_type = :value
-					order by fa.field_address_administrative_area, n.title", 
-					array(":value" => "user")
-				);
-			  //build options
-			  $options = array(t("All") => t("-Any-"));
-			  
-			  foreach($qry as $row) {
-			  
-			  	$options[$row->prov][$row->nid] = $row->title;
-			  
-			  }
-			  //printAndDie($options);
-			  
-			  $form['field_organization_nid']['#options'] = $options;
+			  $form['field_organization_nid']['#options'] = _cals_forms_get_org_options_by_users();
 			}
-
 			break;
 
 		case "post_node_form":
@@ -116,6 +108,30 @@ function cals_forms_form_alter(&$form, &$form_state, $form_id) {
 	}
 
 }
+/**
+ * Custom query to generate options array for org selectors; constrains the selection
+ * to organizations w/ associated users. This is used in various views / node-edit pages
+ * 
+ */
+
+function _cals_forms_get_org_options_by_users() {
+
+	//inner join on orgs w/ associated users
+	$qry = db_query("SELECT distinct n.nid, n.title, fd.*, fa.field_address_administrative_area as prov 
+		FROM {field_data_field_organization} fd inner join {node} n on fd.field_organization_nid = n.nid 
+		  inner join {field_data_field_address} fa on fa.entity_id = n.nid
+		WHERE fd.entity_type = :value
+		order by fa.field_address_administrative_area, n.title", 
+		array(":value" => "user")
+	);
+	//build options
+	$options = array(t("All") => t("-Any-"));
+	foreach($qry as $row) {
+		$options[$row->prov][$row->nid] = $row->title;
+	}
+	return $options;
+}
+
 /**
  * Custom submit function to re-populate og_group_ref due to issues w/ CORS file upload widget
  * overriding value.
