@@ -4,7 +4,6 @@
 	* @file
 	* A custom module
 	*/
-//drupal_flush_all_caches();	
 
 module_load_include('inc', 'cals_forms', 'cals_forms.blocks');
 /** 
@@ -12,21 +11,35 @@ module_load_include('inc', 'cals_forms', 'cals_forms.blocks');
  */ 
 function cals_forms_menu() { 
 	$items = array();
- 
 	return $items;
 }	
+
 /**
  * Implements hook_block_info().
  */
 
 function cals_forms_block_info() {
   $blocks = array();
-  
-  $blocks['_cals_forms_test_block'] = array(
-    'info' => t('CALS FORMS custom test block'),
+
+  $blocks['cals_forms_library_login'] = array(
+    'info' => t('CALS Forms: Library Node Login Block'),
+    'cache' => DRUPAL_NO_CACHE,
+  );  
+  $blocks['cals_forms_staff_login'] = array(
+    'info' => t('CALS Forms: Dedicated Staff Login Block'),
+    'cache' => DRUPAL_NO_CACHE,
+  ); 
+	$blocks['cals_forms_temp_registration'] = array(
+	  'info' => t("CALS Forms: Temporary Registration Form"),
+	  'cache' => DRUPAL_NO_CACHE,  
+	);
+
+  $blocks['cals_forms_custom_registration'] = array(
+    'info' => t('CALS Forms: Custom Registration'),
     'cache' => DRUPAL_NO_CACHE,
   
-  ); 
+  );  
+
   return $blocks;
 }
 
