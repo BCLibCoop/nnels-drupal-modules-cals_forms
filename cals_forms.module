@@ -25,10 +25,12 @@ function cals_forms_block_info() {
     'info' => t('CALS Forms: Library Node Login Block'),
     'cache' => DRUPAL_NO_CACHE,
   );  
+  /* NOT REQUIRED AT THIS POINT
   $blocks['cals_forms_staff_login'] = array(
     'info' => t('CALS Forms: Dedicated Staff Login Block'),
     'cache' => DRUPAL_NO_CACHE,
-  ); 
+  );
+  */ 
 	$blocks['cals_forms_temp_registration'] = array(
 	  'info' => t("CALS Forms: Temporary Registration Form"),
 	  'cache' => DRUPAL_NO_CACHE,  

@@ -50,7 +50,7 @@ function xcalsauthen_form_organization_node_form_alter(&$form, &$form_state, $fo
 function cals_forms_block_view($delta = '') {
 	switch($delta) {
 		//include this block on libraries where status = pending participant
-  	case "_calsauthen_temp_registration":
+  	case "cals_forms_temp_registration":
   	
       $block = array();
       global $user;
@@ -70,7 +70,7 @@ function cals_forms_block_view($delta = '') {
       }
       break;
   
-  	case "_calsauthen_custom_registration":
+  	case "cals_forms_custom_registration":
   	
       $block = array();
       global $user;
@@ -88,33 +88,30 @@ function cals_forms_block_view($delta = '') {
     	return $block;
     	break;
   
-	  case "_calsauthen_library_login":
+	  case "cals_forms_library_login":
       $block = array();
       //check current node
       if (arg(0) == "node" and is_numeric(arg(1))) {
         $nid = arg(1);
-        $is_partner = calsauthen_get_authentication_parent($nid);
-
+        $is_partner = (function_exists('calsauthen_get_authentication_parent')) ? calsauthen_get_authentication_parent($nid) : 0;
+  
         if ($is_partner > 0) {
+          //dpm("is partner! $is_partner");
           $block['subject'] = ''; //blank for now. use t("") to add subject. Otherwise implement thru block.
   				$form = drupal_render(drupal_get_form("user_login"));
-  				//dpm(__FUNCTION__);
           $block['content'] = '<div class="library-search-login">' . $form . '</div>';
 					return $block;
         }
-        //return "";
       }
       break;
-	  case "_calsauthen_staff_login":
+	  case "cals_forms_staff_login":
 			$block = array();
 			$block['subject'] = ''; //blank for now. use t("") to add subject. Otherwise implement thru block.
 			$form = drupal_get_form("user_login");
 			$block['content'] = '<div class="library-search-login">' . drupal_render($form) . '</div>';
 			return $block;
 			//return "";
-      break;      
-    
-
+      break;
   }
 
 }
