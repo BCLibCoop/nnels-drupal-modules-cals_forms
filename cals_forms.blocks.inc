@@ -96,10 +96,18 @@ function cals_forms_block_view($delta = '') {
         $is_partner = (function_exists('calsauthen_get_authentication_parent')) ? calsauthen_get_authentication_parent($nid) : 0;
   
         if ($is_partner > 0) {
+          $node = node_load($nid);
+					$form = drupal_get_form("user_login");
+					$items = field_get_items('node', $node, 'field_username_label');
+					$output = field_view_value('node', $node, 'field_username_label', $items[0]);
+					$form['name']['#title'] = render($output); //$node->field_username_label['und'][0]['safe_value'];
+					//$form['name']['#description'] = $node->field_password_label['und'][0]['safe_value'];
+					//$form['pass']['#title'] = t('Library PIN');
+					//$form['pass']['#description'] = t('Enter your library PIN.');
+          
           //dpm("is partner! $is_partner");
           $block['subject'] = ''; //blank for now. use t("") to add subject. Otherwise implement thru block.
-  				$form = drupal_render(drupal_get_form("user_login"));
-          $block['content'] = '<div class="library-search-login">' . $form . '</div>';
+          $block['content'] = '<div class="library-search-login">' . drupal_render($form) . '</div>';
 					return $block;
         }
       }
