@@ -98,14 +98,18 @@ function cals_forms_block_view($delta = '') {
         if ($is_partner > 0) {
           $node = node_load($nid);
 					$form = drupal_get_form("user_login");
-					$items = field_get_items('node', $node, 'field_username_label');
-					$output = field_view_value('node', $node, 'field_username_label', $items[0]);
-					$form['name']['#title'] = render($output); //$node->field_username_label['und'][0]['safe_value'];
-					//$form['name']['#description'] = $node->field_password_label['und'][0]['safe_value'];
-					//$form['pass']['#title'] = t('Library PIN');
-					//$form['pass']['#description'] = t('Enter your library PIN.');
-          
-          //dpm("is partner! $is_partner");
+					$arr = array(
+					  'field_username_label' => array('name', '#title'),
+					  'field_password_label' => array('pass', '#title'),
+					  'field_password_description' => array('pass','#description'),
+					  'field_username_description' => array('name', '#description'),
+					  'field_login_block_message' => array('message', '#markup'),
+					);
+					foreach($arr as $field => $fieldnames) {
+					  $items = field_get_items('node', $node, $field);
+					  $label = field_view_value('node', $node, $field, $items[0]);
+					  if(!empty($label['#markup'])) $form[$fieldnames[0]][$fieldnames[1]] = render($label);
+					}
           $block['subject'] = ''; //blank for now. use t("") to add subject. Otherwise implement thru block.
           $block['content'] = '<div class="library-search-login">' . drupal_render($form) . '</div>';
 					return $block;
