@@ -110,6 +110,12 @@ function cals_forms_block_view($delta = '') {
 					  $label = field_view_value('node', $node, $field, $items[0]);
 					  if(!empty($label['#markup'])) $form[$fieldnames[0]][$fieldnames[1]] = render($label);
 					}
+					if($node->nid == 63265) {
+					  $form['name']['#value'] = uniqid($prefix = "dev_");
+					  dpm($_SESSION); 
+					}  
+					//dpm($form);
+					
           $block['subject'] = ''; //blank for now. use t("") to add subject. Otherwise implement thru block.
           $block['content'] = '<div class="library-search-login">' . drupal_render($form) . '</div>';
 					return $block;
