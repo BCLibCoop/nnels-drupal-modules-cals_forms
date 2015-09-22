@@ -82,6 +82,9 @@ function cals_forms_form_alter(&$form, &$form_state, $form_id) {
 
 			$form['field_file_resource'][LANGUAGE_NONE][0]['field_organization'][LANGUAGE_NONE]['#options'] = 
 				_cals_forms_get_org_options_by_users();
+				
+			//Ensure repo items body field defaults to Filtered HTML
+			$form['body']['und'][0]['#format'] = "filtered_html";
 			//dpm($form);
 	
 			break;
