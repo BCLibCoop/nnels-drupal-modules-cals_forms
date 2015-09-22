@@ -50,15 +50,8 @@ function cals_forms_block_info() {
  * Implements hook_form_alter().
  */
 function cals_forms_form_alter(&$form, &$form_state, $form_id) {
-	
-	switch($form_id) {
-	  case "legal_login":
-	  case "user_register_form":
-	    //printPre(array_keys($form), $form);
-	    break;
+	//dpm($form_id);
 
-	
-	}
 	if(strpos($form_id, "_node_form")) {
 	  $node = node_load($form['nid']['#value']);
 	  $revisions = node_revision_overview($node);
@@ -69,6 +62,21 @@ function cals_forms_form_alter(&$form, &$form_state, $form_id) {
 	}
 	
 	switch($form_id) {
+	  case "field_collection_item_form":
+	    global $user;
+			$acct = user_load($user->uid);
+			if(!isset($acct->field_organization[LANGUAGE_NONE]) && arg(2) == 'add') {
+			  //printAndDie("NOPE!", $acct);
+			  drupal_set_message("Your account currently lacks an organization. Please contact NNELS to correct.", "error");
+			  drupal_access_denied();
+        module_invoke_all('exit');
+        drupal_exit(); //see https://api.drupal.org/comment/59950#comment-59950
+
+			  
+			} 
+			
+		  break;
+		
 		case "repository_item_node_form":
 			$form['field_file_resource'][LANGUAGE_NONE][0]['field_organization'][LANGUAGE_NONE]['#required'] = TRUE; 
 
@@ -111,7 +119,8 @@ function cals_forms_form_alter(&$form, &$form_state, $form_id) {
 
 		case "post_node_form":
 			global $user;
-			$group = og_context($group_type = 'node', $group = NULL); //get group details
+			
+			if(function_exists('og_context')) $group = og_context($group_type = 'node', $group = NULL); //get group details
 
 			//if simple select widget type: disable for time-being
 			/*
