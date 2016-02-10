@@ -62,7 +62,8 @@ function cals_forms_block_view($delta = '') {
 	          $block['content'] =  '<p>' . 
 	          	//t('@library is a future participant in the NNELS project pending final approval. You may apply for a registration. We will review and inform you if you ....:', array('@library' => $node->title) ) 
 	          	//t('Logging in with your @library credentials is not yet enabled. Please fill in the form below for temporary access to NNELS in the meantime.', array('@library' => $node->title))
-	            t('Logging in with your @library credentials is not yet enabled. Please fill in the form below to request access to NNELS.', array('@library' => $node->title))
+	            //t('Logging in with your @library credentials is not yet enabled. Please fill in the form below to request access to NNELS.', array('@library' => $node->title))
+              t('Please complete this form to request access to NNELS. You will need a library card and an email address. If you do not have a library card, please contact your local public library. If you do not have an email address, please contact NNELS Support at 1-888-848-9250, Option 5.', array('@library' => $node->title))
 	            . '</p>' . drupal_render(drupal_get_form('user_register_form'));
 	      	  return $block;
           }
