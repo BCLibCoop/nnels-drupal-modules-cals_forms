@@ -112,7 +112,7 @@ function cals_forms_block_view($delta = '') {
 					}
 					if($node->nid == 63265) {
 					  $form['name']['#value'] = uniqid($prefix = "dev_");
-					  dpm($_SESSION); 
+					  //dpm($_SESSION);
 					}  
 					//dpm($form);
 					
